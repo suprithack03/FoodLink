@@ -3,6 +3,7 @@ package com.foodlink.foodlink.controller;
 import com.foodlink.foodlink.entity.FoodPost;
 import com.foodlink.foodlink.service.FoodPostService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,18 +29,40 @@ public class FoodPostController {
     }
 
     @PostMapping
-    public FoodPost createFoodPost(@RequestBody FoodPost foodPost) {
-        return foodPostService.createFoodPost(foodPost);
+    public FoodPost createFoodPost(
+            @RequestBody CreateFoodPostRequest request,
+            Authentication authentication) {
+
+        FoodPost foodPost = new FoodPost();
+
+        foodPost.setFoodType(request.getFoodType());
+        foodPost.setQuantity(request.getQuantity());
+        foodPost.setDescription(request.getDescription());
+        foodPost.setPhoto(request.getPhoto());
+        foodPost.setPickupLocation(request.getPickupLocation());
+        foodPost.setAvailableUntil(request.getAvailableUntil());
+
+        String email = authentication.getName();
+
+        return foodPostService.createFoodPost(foodPost, email);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateFoodPost(
             @PathVariable Long id,
-            @RequestBody FoodPost updatedFoodPost) {
+            @RequestBody FoodPost updatedFoodPost,
+            Authentication authentication) {
 
         try {
+
+            String email = authentication.getName();
+
             FoodPost updated =
-                    foodPostService.updateFoodPost(id, updatedFoodPost);
+                    foodPostService.updateFoodPost(
+                            id,
+                            updatedFoodPost,
+                            email
+                    );
 
             if (updated == null) {
                 return ResponseEntity.notFound().build();
@@ -48,12 +71,31 @@ public class FoodPostController {
             return ResponseEntity.ok(updated);
 
         } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteFoodPost(@PathVariable Long id) {
-        foodPostService.deleteFoodPost(id);
+    public ResponseEntity<?> deleteFoodPost(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        try {
+
+            String email = authentication.getName();
+
+            foodPostService.deleteFoodPost(id, email);
+
+            return ResponseEntity.ok(
+                    "Food post deleted successfully"
+            );
+
+        } catch (IllegalStateException e) {
+
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
+        }
     }
 }
