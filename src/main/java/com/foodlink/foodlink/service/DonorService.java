@@ -2,6 +2,7 @@ package com.foodlink.foodlink.service;
 
 import com.foodlink.foodlink.entity.Donor;
 import com.foodlink.foodlink.repository.DonorRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +11,14 @@ import java.util.List;
 public class DonorService {
 
     private final DonorRepository donorRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DonorService(DonorRepository donorRepository) {
+    public DonorService(
+            DonorRepository donorRepository,
+            PasswordEncoder passwordEncoder) {
+
         this.donorRepository = donorRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<Donor> getAllDonors() {
@@ -24,6 +30,12 @@ public class DonorService {
     }
 
     public Donor createDonor(Donor donor) {
+
+        String hashedPassword =
+                passwordEncoder.encode(donor.getPassword());
+
+        donor.setPassword(hashedPassword);
+
         return donorRepository.save(donor);
     }
 

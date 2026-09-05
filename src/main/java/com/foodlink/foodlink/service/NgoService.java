@@ -2,6 +2,7 @@ package com.foodlink.foodlink.service;
 
 import com.foodlink.foodlink.entity.Ngo;
 import com.foodlink.foodlink.repository.NgoRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +11,14 @@ import java.util.List;
 public class NgoService {
 
     private final NgoRepository ngoRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public NgoService(NgoRepository ngoRepository) {
+    public NgoService(
+            NgoRepository ngoRepository,
+            PasswordEncoder passwordEncoder) {
+
         this.ngoRepository = ngoRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<Ngo> getAllNgos() {
@@ -24,6 +30,12 @@ public class NgoService {
     }
 
     public Ngo createNgo(Ngo ngo) {
+
+        String hashedPassword =
+                passwordEncoder.encode(ngo.getPassword());
+
+        ngo.setPassword(hashedPassword);
+
         return ngoRepository.save(ngo);
     }
 
