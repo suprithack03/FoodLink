@@ -3,9 +3,13 @@ package com.foodlink.foodlink.service;
 import com.foodlink.foodlink.entity.Donor;
 import com.foodlink.foodlink.entity.FoodPost;
 import com.foodlink.foodlink.entity.FoodPostStatus;
+import com.foodlink.foodlink.entity.Request;
+import com.foodlink.foodlink.entity.RequestStatus;
 import com.foodlink.foodlink.repository.DonorRepository;
 import com.foodlink.foodlink.repository.FoodPostRepository;
+import com.foodlink.foodlink.repository.RequestRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,13 +18,16 @@ public class FoodPostService {
 
     private final FoodPostRepository foodPostRepository;
     private final DonorRepository donorRepository;
+    private final RequestRepository requestRepository;
 
     public FoodPostService(
             FoodPostRepository foodPostRepository,
-            DonorRepository donorRepository) {
+            DonorRepository donorRepository,
+            RequestRepository requestRepository) {
 
         this.foodPostRepository = foodPostRepository;
         this.donorRepository = donorRepository;
+        this.requestRepository = requestRepository;
     }
 
     public List<FoodPost> getAllFoodPosts() {
@@ -31,7 +38,9 @@ public class FoodPostService {
         return foodPostRepository.findById(id).orElse(null);
     }
 
-    public FoodPost createFoodPost(FoodPost foodPost, String email) {
+    public FoodPost createFoodPost(
+            FoodPost foodPost,
+            String email) {
 
         Donor donor = donorRepository.findByEmail(email)
                 .orElseThrow(() ->
@@ -69,11 +78,26 @@ public class FoodPostService {
             );
         }
 
-        existingFoodPost.setFoodType(updatedFoodPost.getFoodType());
-        existingFoodPost.setQuantity(updatedFoodPost.getQuantity());
-        existingFoodPost.setDescription(updatedFoodPost.getDescription());
-        existingFoodPost.setPhoto(updatedFoodPost.getPhoto());
-        existingFoodPost.setPickupLocation(updatedFoodPost.getPickupLocation());
+        existingFoodPost.setFoodType(
+                updatedFoodPost.getFoodType()
+        );
+
+        existingFoodPost.setQuantity(
+                updatedFoodPost.getQuantity()
+        );
+
+        existingFoodPost.setDescription(
+                updatedFoodPost.getDescription()
+        );
+
+        existingFoodPost.setPhoto(
+                updatedFoodPost.getPhoto()
+        );
+
+        existingFoodPost.setPickupLocation(
+                updatedFoodPost.getPickupLocation()
+        );
+
         existingFoodPost.setAvailableUntil(
                 updatedFoodPost.getAvailableUntil()
         );
@@ -81,7 +105,10 @@ public class FoodPostService {
         return foodPostRepository.save(existingFoodPost);
     }
 
-    public void cancelFoodPost(Long id, String email) {
+    @Transactional
+    public void cancelFoodPost(
+            Long id,
+            String email) {
 
         FoodPost existingFoodPost =
                 foodPostRepository.findById(id).orElse(null);
@@ -104,8 +131,33 @@ public class FoodPostService {
             );
         }
 
-        existingFoodPost.setStatus(FoodPostStatus.CANCELLED);
+        /*
+         * Cancel the FoodPost.
+         */
+        existingFoodPost.setStatus(
+                FoodPostStatus.CANCELLED
+        );
 
+        /*
+         * Reject all Requests that are still PENDING.
+         */
+        List<Request> requests =
+                requestRepository.findByFoodPostId(id);
+
+        for (Request request : requests) {
+
+            if (request.getStatus() == RequestStatus.PENDING) {
+
+                request.setStatus(
+                        RequestStatus.REJECTED
+                );
+            }
+        }
+
+        /*
+         * Save both sides inside the same transaction.
+         */
         foodPostRepository.save(existingFoodPost);
+        requestRepository.saveAll(requests);
     }
 }

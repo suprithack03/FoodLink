@@ -20,16 +20,6 @@ public class RequestController {
         this.requestService = requestService;
     }
 
-    @GetMapping
-    public List<Request> getAllRequests() {
-        return requestService.getAllRequests();
-    }
-
-    @GetMapping("/{id}")
-    public Request getRequestById(@PathVariable Long id) {
-        return requestService.getRequestById(id);
-    }
-
     @GetMapping("/my")
     public ResponseEntity<?> getMyRequests(
             Authentication authentication) {

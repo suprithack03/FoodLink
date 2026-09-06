@@ -36,14 +36,6 @@ public class RequestService {
         this.foodPostRepository = foodPostRepository;
     }
 
-    public List<Request> getAllRequests() {
-        return requestRepository.findAll();
-    }
-
-    public Request getRequestById(Long id) {
-        return requestRepository.findById(id).orElse(null);
-    }
-
     public List<Request> getRequestsByNgo(String email) {
 
         Ngo ngo = ngoRepository.findByEmail(email)
@@ -102,10 +94,6 @@ public class RequestService {
         request.setStatus(RequestStatus.PENDING);
         request.setCreatedAt(LocalDateTime.now());
 
-        return requestRepository.save(request);
-    }
-
-    public Request updateRequest(Request request) {
         return requestRepository.save(request);
     }
 
@@ -278,3 +266,4 @@ public class RequestService {
         requestRepository.saveAll(requests);
     }
 }
+
