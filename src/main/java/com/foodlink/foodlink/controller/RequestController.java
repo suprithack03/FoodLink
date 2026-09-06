@@ -133,29 +133,4 @@ public class RequestController {
                     .body(e.getMessage());
         }
     }
-
-    @PutMapping("/{id}")
-    public Request updateRequest(
-            @PathVariable Long id,
-            @RequestBody Request updatedRequest) {
-
-        Request existingRequest =
-                requestService.getRequestById(id);
-
-        if (existingRequest == null) {
-            return null;
-        }
-
-        existingRequest.setFoodPost(updatedRequest.getFoodPost());
-        existingRequest.setNgo(updatedRequest.getNgo());
-        existingRequest.setStatus(updatedRequest.getStatus());
-        existingRequest.setCreatedAt(updatedRequest.getCreatedAt());
-
-        return requestService.updateRequest(existingRequest);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteRequest(@PathVariable Long id) {
-        requestService.deleteRequest(id);
-    }
 }

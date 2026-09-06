@@ -277,8 +277,4 @@ public class RequestService {
         foodPostRepository.save(foodPost);
         requestRepository.saveAll(requests);
     }
-
-    public void deleteRequest(Long id) {
-        requestRepository.deleteById(id);
-    }
 }
