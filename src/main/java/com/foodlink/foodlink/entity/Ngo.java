@@ -1,3 +1,4 @@
+
 package com.foodlink.foodlink.entity;
 
 import jakarta.persistence.*;
@@ -30,6 +31,7 @@ public class Ngo {
     private boolean verified;
 
     @OneToMany(mappedBy = "ngo")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Request> requests;
 
     public Ngo() {
