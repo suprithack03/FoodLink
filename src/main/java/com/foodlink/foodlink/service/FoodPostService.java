@@ -74,12 +74,14 @@ public class FoodPostService {
         existingFoodPost.setDescription(updatedFoodPost.getDescription());
         existingFoodPost.setPhoto(updatedFoodPost.getPhoto());
         existingFoodPost.setPickupLocation(updatedFoodPost.getPickupLocation());
-        existingFoodPost.setAvailableUntil(updatedFoodPost.getAvailableUntil());
+        existingFoodPost.setAvailableUntil(
+                updatedFoodPost.getAvailableUntil()
+        );
 
         return foodPostRepository.save(existingFoodPost);
     }
 
-    public void deleteFoodPost(Long id, String email) {
+    public void cancelFoodPost(Long id, String email) {
 
         FoodPost existingFoodPost =
                 foodPostRepository.findById(id).orElse(null);
@@ -92,16 +94,18 @@ public class FoodPostService {
 
         if (!existingFoodPost.getDonor().getEmail().equals(email)) {
             throw new IllegalStateException(
-                    "You are not allowed to delete this food post"
+                    "You are not allowed to cancel this food post"
             );
         }
 
         if (existingFoodPost.getStatus() != FoodPostStatus.PENDING) {
             throw new IllegalStateException(
-                    "Only PENDING food posts can be deleted"
+                    "Only PENDING food posts can be cancelled"
             );
         }
 
-        foodPostRepository.delete(existingFoodPost);
+        existingFoodPost.setStatus(FoodPostStatus.CANCELLED);
+
+        foodPostRepository.save(existingFoodPost);
     }
 }

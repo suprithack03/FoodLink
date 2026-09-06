@@ -54,7 +54,6 @@ public class FoodPostController {
             Authentication authentication) {
 
         try {
-
             String email = authentication.getName();
 
             FoodPost updated =
@@ -71,29 +70,26 @@ public class FoodPostController {
             return ResponseEntity.ok(updated);
 
         } catch (IllegalStateException e) {
-
             return ResponseEntity.badRequest()
                     .body(e.getMessage());
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteFoodPost(
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<?> cancelFoodPost(
             @PathVariable Long id,
             Authentication authentication) {
 
         try {
-
             String email = authentication.getName();
 
-            foodPostService.deleteFoodPost(id, email);
+            foodPostService.cancelFoodPost(id, email);
 
             return ResponseEntity.ok(
-                    "Food post deleted successfully"
+                    "Food post cancelled successfully"
             );
 
         } catch (IllegalStateException e) {
-
             return ResponseEntity.badRequest()
                     .body(e.getMessage());
         }
