@@ -11,6 +11,7 @@ import com.foodlink.foodlink.repository.RequestRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -38,6 +39,10 @@ public class FoodPostService {
         return foodPostRepository.findById(id).orElse(null);
     }
 
+    public List<FoodPost> getFoodPostsByDonor(String email) {
+        return foodPostRepository.findByDonorEmail(email);
+    }
+
     public FoodPost createFoodPost(
             FoodPost foodPost,
             String email) {
@@ -49,6 +54,7 @@ public class FoodPostService {
                         ));
 
         foodPost.setDonor(donor);
+        foodPost.setPostedAt(LocalDateTime.now());
         foodPost.setStatus(FoodPostStatus.PENDING);
 
         return foodPostRepository.save(foodPost);
@@ -78,45 +84,36 @@ public class FoodPostService {
             );
         }
 
-        existingFoodPost.setFoodType(
-                updatedFoodPost.getFoodType()
-        );
-
-        existingFoodPost.setQuantity(
-                updatedFoodPost.getQuantity()
-        );
-
-        existingFoodPost.setDescription(
-                updatedFoodPost.getDescription()
-        );
-
-        existingFoodPost.setPhoto(
-                updatedFoodPost.getPhoto()
-        );
-
+        existingFoodPost.setFoodType(updatedFoodPost.getFoodType());
+        existingFoodPost.setQuantity(updatedFoodPost.getQuantity());
+        existingFoodPost.setDescription(updatedFoodPost.getDescription());
+        existingFoodPost.setPhoto(updatedFoodPost.getPhoto());
         existingFoodPost.setPickupLocation(
                 updatedFoodPost.getPickupLocation()
         );
 
+        existingFoodPost.setLatitude(updatedFoodPost.getLatitude());
+        existingFoodPost.setLongitude(updatedFoodPost.getLongitude());
+
         existingFoodPost.setAvailableUntil(
                 updatedFoodPost.getAvailableUntil()
+        );
+
+        existingFoodPost.setShelfLifeHours(
+                updatedFoodPost.getShelfLifeHours()
         );
 
         return foodPostRepository.save(existingFoodPost);
     }
 
     @Transactional
-    public void cancelFoodPost(
-            Long id,
-            String email) {
+    public void cancelFoodPost(Long id, String email) {
 
         FoodPost existingFoodPost =
                 foodPostRepository.findById(id).orElse(null);
 
         if (existingFoodPost == null) {
-            throw new IllegalStateException(
-                    "Food post not found"
-            );
+            throw new IllegalStateException("Food post not found");
         }
 
         if (!existingFoodPost.getDonor().getEmail().equals(email)) {
@@ -131,32 +128,17 @@ public class FoodPostService {
             );
         }
 
-        /*
-         * Cancel the FoodPost.
-         */
-        existingFoodPost.setStatus(
-                FoodPostStatus.CANCELLED
-        );
+        existingFoodPost.setStatus(FoodPostStatus.CANCELLED);
 
-        /*
-         * Reject all Requests that are still PENDING.
-         */
         List<Request> requests =
                 requestRepository.findByFoodPostId(id);
 
         for (Request request : requests) {
-
             if (request.getStatus() == RequestStatus.PENDING) {
-
-                request.setStatus(
-                        RequestStatus.REJECTED
-                );
+                request.setStatus(RequestStatus.REJECTED);
             }
         }
 
-        /*
-         * Save both sides inside the same transaction.
-         */
         foodPostRepository.save(existingFoodPost);
         requestRepository.saveAll(requests);
     }

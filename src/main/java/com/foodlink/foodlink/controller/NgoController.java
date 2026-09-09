@@ -48,6 +48,10 @@ public class NgoController {
         existingNgo.setPassword(updatedNgo.getPassword());
         existingNgo.setPhone(updatedNgo.getPhone());
         existingNgo.setLocation(updatedNgo.getLocation());
+
+        existingNgo.setLatitude(updatedNgo.getLatitude());
+        existingNgo.setLongitude(updatedNgo.getLongitude());
+
         existingNgo.setVerified(updatedNgo.isVerified());
 
         return ngoService.updateNgo(existingNgo);

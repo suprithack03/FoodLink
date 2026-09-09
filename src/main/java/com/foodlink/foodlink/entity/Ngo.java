@@ -1,4 +1,3 @@
-
 package com.foodlink.foodlink.entity;
 
 import jakarta.persistence.*;
@@ -28,10 +27,15 @@ public class Ngo {
 
     private String location;
 
+    private Double latitude;
+
+    private Double longitude;
+
     private boolean verified;
 
+    private Integer capacity;
+
     @OneToMany(mappedBy = "ngo")
-    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Request> requests;
 
     public Ngo() {
@@ -85,12 +89,36 @@ public class Ngo {
         this.location = location;
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
     public boolean isVerified() {
         return verified;
     }
 
     public void setVerified(boolean verified) {
         this.verified = verified;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
     }
 
     public List<Request> getRequests() {

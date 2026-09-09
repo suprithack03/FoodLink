@@ -31,6 +31,22 @@ public class SecurityConfig {
                         ).permitAll()
 
                         /*
+                         * Temporary Gemini connectivity test endpoint.
+                         */
+                        .requestMatchers(
+                                "/api/gemini/test"
+                        ).permitAll()
+
+                        /*
+                         * Gemini food extraction is a DONOR action.
+                         * The donor must be authenticated.
+                         */
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/gemini/extract-food-post"
+                        ).hasRole("DONOR")
+
+                        /*
                          * Only DONOR can create food posts.
                          */
                         .requestMatchers(

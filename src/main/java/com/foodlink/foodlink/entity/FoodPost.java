@@ -27,7 +27,15 @@ public class FoodPost {
 
     private String pickupLocation;
 
+    private Double latitude;
+
+    private Double longitude;
+
     private LocalDateTime availableUntil;
+
+    private LocalDateTime postedAt;
+
+    private Double shelfLifeHours;
 
     @Enumerated(EnumType.STRING)
     private FoodPostStatus status;
@@ -45,6 +53,14 @@ public class FoodPost {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Donor getDonor() {
+        return donor;
+    }
+
+    public void setDonor(Donor donor) {
+        this.donor = donor;
     }
 
     public String getFoodType() {
@@ -87,6 +103,22 @@ public class FoodPost {
         this.pickupLocation = pickupLocation;
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
     public LocalDateTime getAvailableUntil() {
         return availableUntil;
     }
@@ -95,20 +127,28 @@ public class FoodPost {
         this.availableUntil = availableUntil;
     }
 
+    public LocalDateTime getPostedAt() {
+        return postedAt;
+    }
+
+    public void setPostedAt(LocalDateTime postedAt) {
+        this.postedAt = postedAt;
+    }
+
+    public Double getShelfLifeHours() {
+        return shelfLifeHours;
+    }
+
+    public void setShelfLifeHours(Double shelfLifeHours) {
+        this.shelfLifeHours = shelfLifeHours;
+    }
+
     public FoodPostStatus getStatus() {
         return status;
     }
 
     public void setStatus(FoodPostStatus status) {
         this.status = status;
-    }
-
-    public Donor getDonor() {
-        return donor;
-    }
-
-    public void setDonor(Donor donor) {
-        this.donor = donor;
     }
 
     public List<Request> getRequests() {

@@ -14,7 +14,13 @@ public class CreateFoodPostRequest {
 
     private String pickupLocation;
 
+    private Double latitude;
+
+    private Double longitude;
+
     private LocalDateTime availableUntil;
+
+    private Double shelfLifeHours;
 
     public CreateFoodPostRequest() {
     }
@@ -59,11 +65,35 @@ public class CreateFoodPostRequest {
         this.pickupLocation = pickupLocation;
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
     public LocalDateTime getAvailableUntil() {
         return availableUntil;
     }
 
     public void setAvailableUntil(LocalDateTime availableUntil) {
         this.availableUntil = availableUntil;
+    }
+
+    public Double getShelfLifeHours() {
+        return shelfLifeHours;
+    }
+
+    public void setShelfLifeHours(Double shelfLifeHours) {
+        this.shelfLifeHours = shelfLifeHours;
     }
 }

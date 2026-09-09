@@ -13,4 +13,11 @@ public interface FoodPostRepository extends JpaRepository<FoodPost, Long> {
             FoodPostStatus status,
             LocalDateTime time
     );
+
+    List<FoodPost> findByStatusAndAvailableUntilGreaterThan(
+            FoodPostStatus status,
+            LocalDateTime time
+    );
+
+    List<FoodPost> findByDonorEmail(String email);
 }

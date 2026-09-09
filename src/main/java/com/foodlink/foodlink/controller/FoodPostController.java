@@ -28,6 +28,24 @@ public class FoodPostController {
         return foodPostService.getFoodPostById(id);
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyFoodPosts(
+            Authentication authentication) {
+
+        try {
+            String email = authentication.getName();
+
+            List<FoodPost> foodPosts =
+                    foodPostService.getFoodPostsByDonor(email);
+
+            return ResponseEntity.ok(foodPosts);
+
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
+        }
+    }
+
     @PostMapping
     public FoodPost createFoodPost(
             @RequestBody CreateFoodPostRequest request,
@@ -40,7 +58,12 @@ public class FoodPostController {
         foodPost.setDescription(request.getDescription());
         foodPost.setPhoto(request.getPhoto());
         foodPost.setPickupLocation(request.getPickupLocation());
+
+        foodPost.setLatitude(request.getLatitude());
+        foodPost.setLongitude(request.getLongitude());
+
         foodPost.setAvailableUntil(request.getAvailableUntil());
+        foodPost.setShelfLifeHours(request.getShelfLifeHours());
 
         String email = authentication.getName();
 
@@ -52,16 +75,12 @@ public class FoodPostController {
             @PathVariable Long id,
             @RequestBody FoodPost updatedFoodPost,
             Authentication authentication) {
-
         try {
             String email = authentication.getName();
 
             FoodPost updated =
                     foodPostService.updateFoodPost(
-                            id,
-                            updatedFoodPost,
-                            email
-                    );
+                            id, updatedFoodPost, email);
 
             if (updated == null) {
                 return ResponseEntity.notFound().build();
@@ -70,8 +89,7 @@ public class FoodPostController {
             return ResponseEntity.ok(updated);
 
         } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest()
-                    .body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -79,7 +97,6 @@ public class FoodPostController {
     public ResponseEntity<?> cancelFoodPost(
             @PathVariable Long id,
             Authentication authentication) {
-
         try {
             String email = authentication.getName();
 
@@ -90,8 +107,7 @@ public class FoodPostController {
             );
 
         } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest()
-                    .body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }
