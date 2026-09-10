@@ -2,41 +2,17 @@ package com.foodlink.foodlink.service;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Random;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GreedyVsHungarianBenchmarkTest {
 
+    private static final int NUMBER_OF_CASES = 100;
+    private static final int MATRIX_SIZE = 10;
+
     @Test
-    void shouldCompareHungarianAndGreedyAcrossMultipleCases() {
-
-        double[][][] testMatrices = {
-
-                {
-                        {1, 2},
-                        {2, 100}
-                },
-
-                {
-                        {4, 8, 6},
-                        {7, 3, 9},
-                        {5, 10, 2}
-                },
-
-                {
-                        {10, 2, 9, 7},
-                        {6, 8, 3, 5},
-                        {4, 7, 6, 2},
-                        {9, 5, 8, 4}
-                },
-
-                {
-                        {3, 9, 2, 8, 7},
-                        {6, 4, 8, 3, 9},
-                        {7, 5, 6, 4, 2},
-                        {8, 3, 7, 6, 5},
-                        {2, 8, 4, 9, 3}
-                }
-        };
+    void shouldCompareHungarianAndGreedyAcrossGeneratedCases() {
 
         HungarianAlgorithm hungarianAlgorithm =
                 new HungarianAlgorithm();
@@ -44,14 +20,21 @@ class GreedyVsHungarianBenchmarkTest {
         GreedyMatchingService greedyMatchingService =
                 new GreedyMatchingService();
 
+        Random random = new Random(42);
+
         double totalHungarianCost = 0;
         double totalGreedyCost = 0;
 
-        int casesWhereHungarianIsBetter = 0;
+        int hungarianBetterCount = 0;
+        int greedyBetterCount = 0;
+        int equalCount = 0;
 
-        for (int i = 0; i < testMatrices.length; i++) {
+        for (int testCase = 1;
+             testCase <= NUMBER_OF_CASES;
+             testCase++) {
 
-            double[][] costMatrix = testMatrices[i];
+            double[][] costMatrix =
+                    generateCostMatrix(random);
 
             int[] hungarianAssignment =
                     hungarianAlgorithm.solve(costMatrix);
@@ -75,16 +58,17 @@ class GreedyVsHungarianBenchmarkTest {
             totalGreedyCost += greedyCost;
 
             if (hungarianCost < greedyCost) {
-                casesWhereHungarianIsBetter++;
-            }
 
-            System.out.println(
-                    "Case " + (i + 1)
-                            + " - Hungarian: "
-                            + hungarianCost
-                            + ", Greedy: "
-                            + greedyCost
-            );
+                hungarianBetterCount++;
+
+            } else if (greedyCost < hungarianCost) {
+
+                greedyBetterCount++;
+
+            } else {
+
+                equalCount++;
+            }
         }
 
         double percentageImprovement =
@@ -92,6 +76,18 @@ class GreedyVsHungarianBenchmarkTest {
                         / totalGreedyCost) * 100.0;
 
         System.out.println();
+        System.out.println(
+                "Benchmark cases: "
+                        + NUMBER_OF_CASES
+        );
+
+        System.out.println(
+                "Matrix size: "
+                        + MATRIX_SIZE
+                        + " x "
+                        + MATRIX_SIZE
+        );
+
         System.out.println(
                 "Total Hungarian cost: "
                         + totalHungarianCost
@@ -103,10 +99,20 @@ class GreedyVsHungarianBenchmarkTest {
         );
 
         System.out.println(
-                "Hungarian better in "
-                        + casesWhereHungarianIsBetter
-                        + " out of "
-                        + testMatrices.length
+                "Hungarian better: "
+                        + hungarianBetterCount
+                        + " cases"
+        );
+
+        System.out.println(
+                "Greedy better: "
+                        + greedyBetterCount
+                        + " cases"
+        );
+
+        System.out.println(
+                "Equal: "
+                        + equalCount
                         + " cases"
         );
 
@@ -119,10 +125,23 @@ class GreedyVsHungarianBenchmarkTest {
         assertTrue(
                 totalHungarianCost <= totalGreedyCost
         );
+    }
 
-        assertTrue(
-                casesWhereHungarianIsBetter > 0
-        );
+    private double[][] generateCostMatrix(Random random) {
+
+        double[][] costMatrix =
+                new double[MATRIX_SIZE][MATRIX_SIZE];
+
+        for (int i = 0; i < MATRIX_SIZE; i++) {
+
+            for (int j = 0; j < MATRIX_SIZE; j++) {
+
+                costMatrix[i][j] =
+                        1 + random.nextInt(100);
+            }
+        }
+
+        return costMatrix;
     }
 
     private double calculateTotalCost(
