@@ -52,7 +52,12 @@ public class NgoController {
         existingNgo.setLatitude(updatedNgo.getLatitude());
         existingNgo.setLongitude(updatedNgo.getLongitude());
 
-        existingNgo.setVerified(updatedNgo.isVerified());
+        /*
+         * Do NOT update the verified field here.
+         *
+         * NGO verification must be controlled separately
+         * and must not be changed by a normal public update request.
+         */
 
         return ngoService.updateNgo(existingNgo);
     }
@@ -62,3 +67,4 @@ public class NgoController {
         ngoService.deleteNgo(id);
     }
 }
+

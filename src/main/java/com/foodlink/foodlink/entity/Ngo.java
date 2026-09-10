@@ -1,5 +1,6 @@
 package com.foodlink.foodlink.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class Ngo {
 
     private Integer capacity;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "ngo")
     private List<Request> requests;
 

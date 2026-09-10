@@ -18,6 +18,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
 
+                .cors(cors -> {})
+
                 .authorizeHttpRequests(auth -> auth
 
                         /*
@@ -39,7 +41,6 @@ public class SecurityConfig {
 
                         /*
                          * Gemini food extraction is a DONOR action.
-                         * The donor must be authenticated.
                          */
                         .requestMatchers(
                                 HttpMethod.POST,
@@ -53,6 +54,14 @@ public class SecurityConfig {
                                 HttpMethod.POST,
                                 "/api/food-posts"
                         ).hasRole("DONOR")
+
+                        /*
+                         * Only NGO can view available food donations.
+                         */
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/food-posts/available"
+                        ).hasRole("NGO")
 
                         /*
                          * Request creation is an NGO action.
@@ -86,6 +95,14 @@ public class SecurityConfig {
                                 HttpMethod.PUT,
                                 "/api/requests/*/status"
                         ).hasRole("DONOR")
+
+                        /*
+                         * All admin endpoints are accessible only
+                         * to authenticated administrators.
+                         */
+                        .requestMatchers(
+                                "/api/admins/**"
+                        ).hasRole("ADMIN")
 
                         /*
                          * Everything else requires authentication.

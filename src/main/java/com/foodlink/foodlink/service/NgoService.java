@@ -31,6 +31,12 @@ public class NgoService {
 
     public Ngo createNgo(Ngo ngo) {
 
+        /*
+         * Every newly registered NGO must start
+         * as unverified.
+         */
+        ngo.setVerified(false);
+
         String hashedPassword =
                 passwordEncoder.encode(ngo.getPassword());
 
@@ -45,5 +51,25 @@ public class NgoService {
 
     public void deleteNgo(Long id) {
         ngoRepository.deleteById(id);
+    }
+
+    /*
+     * Verify or unverify an NGO.
+     *
+     * This method will be called only by the
+     * admin verification endpoint.
+     */
+    public Ngo setNgoVerificationStatus(
+            Long id,
+            boolean verified) {
+
+        Ngo ngo = ngoRepository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "NGO not found with id: " + id));
+
+        ngo.setVerified(verified);
+
+        return ngoRepository.save(ngo);
     }
 }

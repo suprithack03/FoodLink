@@ -35,6 +35,13 @@ public class FoodPostService {
         return foodPostRepository.findAll();
     }
 
+    public List<FoodPost> getAvailableFoodPosts() {
+        return foodPostRepository.findByStatusAndAvailableUntilGreaterThan(
+                FoodPostStatus.PENDING,
+                LocalDateTime.now()
+        );
+    }
+
     public FoodPost getFoodPostById(Long id) {
         return foodPostRepository.findById(id).orElse(null);
     }
@@ -53,9 +60,25 @@ public class FoodPostService {
                                 "Authenticated donor not found"
                         ));
 
+        LocalDateTime postedAt = LocalDateTime.now();
+
         foodPost.setDonor(donor);
-        foodPost.setPostedAt(LocalDateTime.now());
+        foodPost.setPostedAt(postedAt);
         foodPost.setStatus(FoodPostStatus.PENDING);
+
+        if (foodPost.getShelfLifeHours() == null ||
+                foodPost.getShelfLifeHours() <= 0) {
+
+            throw new IllegalStateException(
+                    "Shelf life must be greater than 0 hours"
+            );
+        }
+
+        foodPost.setAvailableUntil(
+                postedAt.plusMinutes(
+                        Math.round(foodPost.getShelfLifeHours() * 60)
+                )
+        );
 
         return foodPostRepository.save(foodPost);
     }
@@ -95,12 +118,31 @@ public class FoodPostService {
         existingFoodPost.setLatitude(updatedFoodPost.getLatitude());
         existingFoodPost.setLongitude(updatedFoodPost.getLongitude());
 
-        existingFoodPost.setAvailableUntil(
-                updatedFoodPost.getAvailableUntil()
-        );
+        if (updatedFoodPost.getShelfLifeHours() == null ||
+                updatedFoodPost.getShelfLifeHours() <= 0) {
+
+            throw new IllegalStateException(
+                    "Shelf life must be greater than 0 hours"
+            );
+        }
 
         existingFoodPost.setShelfLifeHours(
                 updatedFoodPost.getShelfLifeHours()
+        );
+
+        LocalDateTime postedAt = existingFoodPost.getPostedAt();
+
+        if (postedAt == null) {
+            postedAt = LocalDateTime.now();
+            existingFoodPost.setPostedAt(postedAt);
+        }
+
+        existingFoodPost.setAvailableUntil(
+                postedAt.plusMinutes(
+                        Math.round(
+                                updatedFoodPost.getShelfLifeHours() * 60
+                        )
+                )
         );
 
         return foodPostRepository.save(existingFoodPost);

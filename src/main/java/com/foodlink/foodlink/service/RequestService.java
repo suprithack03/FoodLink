@@ -44,7 +44,10 @@ public class RequestService {
                                 "Authenticated NGO not found"
                         ));
 
-        return requestRepository.findByNgoId(ngo.getId());
+        return requestRepository.findByNgoIdAndStatusNot(
+                ngo.getId(),
+                RequestStatus.COMPLETED
+        );
     }
 
     public List<Request> getRequestsByDonor(String email) {
@@ -55,7 +58,10 @@ public class RequestService {
                                 "Authenticated donor not found"
                         ));
 
-        return requestRepository.findByFoodPostDonorId(donor.getId());
+        return requestRepository.findByFoodPostDonorIdAndStatusNot(
+                donor.getId(),
+                RequestStatus.COMPLETED
+        );
     }
 
     public Request createRequest(Long foodPostId, String email) {
@@ -65,6 +71,13 @@ public class RequestService {
                         new IllegalStateException(
                                 "Authenticated NGO not found"
                         ));
+
+        // Only verified NGOs can request food
+        if (!ngo.isVerified()) {
+            throw new IllegalStateException(
+                    "Your NGO account is not verified. You cannot request food yet."
+            );
+        }
 
         FoodPost foodPost = foodPostRepository.findById(foodPostId)
                 .orElseThrow(() ->

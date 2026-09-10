@@ -1,7 +1,9 @@
 package com.foodlink.foodlink.security;
 
+import com.foodlink.foodlink.entity.Admin;
 import com.foodlink.foodlink.entity.Donor;
 import com.foodlink.foodlink.entity.Ngo;
+import com.foodlink.foodlink.repository.AdminRepository;
 import com.foodlink.foodlink.repository.DonorRepository;
 import com.foodlink.foodlink.repository.NgoRepository;
 import org.springframework.security.core.userdetails.User;
@@ -15,13 +17,16 @@ public class FoodLinkUserDetailsService implements UserDetailsService {
 
     private final DonorRepository donorRepository;
     private final NgoRepository ngoRepository;
+    private final AdminRepository adminRepository;
 
     public FoodLinkUserDetailsService(
             DonorRepository donorRepository,
-            NgoRepository ngoRepository) {
+            NgoRepository ngoRepository,
+            AdminRepository adminRepository) {
 
         this.donorRepository = donorRepository;
         this.ngoRepository = ngoRepository;
+        this.adminRepository = adminRepository;
     }
 
     @Override
@@ -46,7 +51,17 @@ public class FoodLinkUserDetailsService implements UserDetailsService {
                     .build();
         }
 
+        Admin admin = adminRepository.findByEmail(email).orElse(null);
+
+        if (admin != null) {
+            return User.withUsername(admin.getEmail())
+                    .password(admin.getPassword())
+                    .roles("ADMIN")
+                    .build();
+        }
+
         throw new UsernameNotFoundException(
                 "User not found with email: " + email);
     }
 }
+

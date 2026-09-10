@@ -10,12 +10,25 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     List<Request> findByNgoId(Long ngoId);
 
+    List<Request> findByNgoIdAndStatusNot(
+            Long ngoId,
+            RequestStatus status
+    );
+
     List<Request> findByFoodPostId(Long foodPostId);
 
     List<Request> findByStatus(RequestStatus status);
 
-    boolean existsByNgoIdAndFoodPostId(Long ngoId, Long foodPostId);
+    boolean existsByNgoIdAndFoodPostId(
+            Long ngoId,
+            Long foodPostId
+    );
 
     List<Request> findByFoodPostDonorId(Long donorId);
+
+    List<Request> findByFoodPostDonorIdAndStatusNot(
+            Long donorId,
+            RequestStatus status
+    );
 }
 
